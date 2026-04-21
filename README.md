@@ -1,45 +1,50 @@
-# dotfiles
+# dotfiles (zsh-first)
 
-my dev setup for macOS
+Personal macOS dev environment with a clean, conflict-free toolchain.
 
-## what's here
+## included
 
-- fish shell + modern cli tools
-- kitty terminal (tokyo night)
+- zsh config
+- kitty terminal
 - starship prompt
 - neovim config
-- git aliases
+- git config
+- zellij config
+- Brewfile + one-command setup
 
-## tools i use
-
-replaced the old stuff with better alternatives:
-- ls → eza (icons!)
-- cat → bat (syntax highlighting)
-- find → fd (faster)
-- grep → rg (way faster)
-- cd → zoxide (smart jumps)
-
-## setup
+## quick setup
 
 ```bash
-git clone https://github.com/kamaldhitalofficial/dotfiles.git ~/Documents/dotfiles
-cd ~/Documents/dotfiles
-stow fish kitty starship nvim git
+git clone git@github.com:kamaldhitalofficial/dotfiles.git ~/dotfiles
+cd ~/dotfiles
+./setup.sh
 ```
 
-**important:** create `~/.gitconfig_device` with your info:
+## manual setup
+
 ```bash
+brew bundle --file Brewfile
+stow git zsh kitty starship nvim zellij
+```
+
+Create `~/.gitconfig_device` if missing:
+
+```ini
 [user]
     name = Your Name
     email = your@email.com
 ```
 
-## syncing
+## productivity shortcuts
 
-when i change something:
+- `zz` → attach/create zellij session from current directory name
+- `zweb_start` → start zellij web server
+- `zshare` → create a web token and print URL/token
+
+## project templates
+
 ```bash
-./sync.fish
-git add .
-git commit -m "update stuff"
-git push
+cp templates/.envrc /path/to/project/.envrc
+cp templates/.python-version /path/to/project/.python-version
+cp templates/.nvmrc /path/to/project/.nvmrc
 ```
