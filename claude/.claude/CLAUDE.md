@@ -45,9 +45,14 @@ No bare except. No empty catch blocks. No 2>/dev/null.
 All errors must be caught explicitly and handled or
 re-raised with context.
 
-# Comments
+# Comments and writing style
 Comment everything non-obvious. Plain lowercase labels.
-No em dashes, box-drawing chars, or decorative separators.
+ZERO decoration anywhere (code, comments, docs, memory).
+ASCII punctuation only.
+Forbidden: em dashes, en dashes, arrows (any direction),
+bullets, box-drawing chars, smart quotes, ellipsis,
+emojis, ASCII art, decorative separators (=== --- *** banners).
+Use only hyphens (-), periods, commas, colons, parens, brackets.
 No AI-speak ("This function efficiently handles...").
 Write like a developer leaving notes for a teammate.
 
