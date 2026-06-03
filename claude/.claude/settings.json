@@ -1,0 +1,217 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "env": {
+    "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "70",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+    "CLAUDE_CODE_SUBAGENT_MODEL": "sonnet",
+    "MAX_MCP_OUTPUT_TOKENS": "20000",
+    "EDITOR": "code --wait",
+    "VISUAL": "code --wait"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(python *)",
+      "Bash(python3 *)",
+      "Bash(uv run *)",
+      "Bash(uv pip *)",
+      "Bash(uv sync *)",
+      "Bash(uv add *)",
+      "Bash(yarn *)",
+      "Bash(yarn dev)",
+      "Bash(yarn build)",
+      "Bash(yarn test *)",
+      "Bash(yarn lint *)",
+      "Bash(git status)",
+      "Bash(git log *)",
+      "Bash(git diff *)",
+      "Bash(git branch *)",
+      "Bash(git stash *)",
+      "Bash(git fetch *)",
+      "Bash(git checkout -b *)",
+      "Bash(git checkout develop)",
+      "Bash(git checkout feature/*)",
+      "Bash(git checkout main)",
+      "Bash(docker ps *)",
+      "Bash(docker logs *)",
+      "Bash(docker-compose ps)",
+      "Bash(docker-compose logs *)",
+      "Bash(uv run python manage.py showmigrations *)",
+      "Bash(uv run python manage.py migrate --check)",
+      "Read(package.json)",
+      "Read(pyproject.toml)",
+      "Read(tsconfig.json)",
+      "Read(CLAUDE.md)",
+      "Read(.gitignore)",
+      "Read(README.md)",
+      "WebSearch",
+      "Read(//Applications/Claude.app/Contents/Resources/**)",
+      "Read(//Applications/Claude.app/Contents/MacOS/**)",
+      "Bash(git -C /Users/kamaldhital/Workspaces/Recruitables/rt-auth-service push)",
+      "Bash(git -C /Users/kamaldhital/Workspaces/Recruitables/rt-payment-service log --oneline -5)",
+      "Bash(env -u VIRTUAL_ENV uv run --extra dev pre-commit run --all-files)",
+      "WebFetch(domain:docs.airscale.io)",
+      "WebFetch(domain:prospeo.io)",
+      "WebFetch(domain:syncgtm.com)",
+      "WebFetch(domain:skywork.ai)",
+      "Bash(./node_modules/.bin/tsc --noEmit)",
+      "Bash(./node_modules/.bin/prettier --write src/features/candidate-sourcing/components/SearchHero.tsx src/features/candidate-sourcing/pages/CandidateSourcingPage.tsx)",
+      "Bash(cat /Users/kamaldhital/FYP/.claude/settings.json 2>/dev/null | head -50; cat /Users/kamaldhital/.claude/settings.json 2>/dev/null | head -50)",
+      "Read(//Users/Shared/.claude-config/**)",
+      "Bash(find /Users/kamaldhital/FYP -name \"settings.json\" -path \"*/.claude/*\" 2>/dev/null; find /Users/kamaldhital -maxdepth 3 -name \"settings.json\" -path \"*/.claude/*\" 2>/dev/null)",
+      "Read(//Users/kamaldhital/**)",
+      "Read(.env.example)",
+      "Read(**/.env.example)",
+      "Bash(git checkout *)",
+      "Bash(uv run python manage.py migrate *)",
+      "Bash(brew install *)",
+      "Bash(docker-compose up *)",
+      "Bash(docker-compose down *)",
+      "Bash(flutter clean *)"
+    ],
+    "deny": [
+      "Bash(git reset --hard)",
+      "Bash(git push --force)",
+      "Bash(docker system prune *)",
+      "Read(services_credentials/*)",
+      "Read(**/secrets/**)",
+      "Read(.env*)",
+      "Read(**/.env*)"
+    ],
+    "ask": [
+      "Bash(git push *)",
+      "Bash(git commit *)",
+      "Bash(git clone *)"
+    ],
+    "defaultMode": "default",
+    "additionalDirectories": [
+      "/Users/kamaldhital/Library/Application Support/Code/User",
+      "/Users/kamaldhital/FYP_DOCS"
+    ]
+  },
+  "model": "claude-opus-4-6[1m]",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "mkdir -p \"${CLAUDE_PROJECT_DIR:-.}/.remember/logs\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/no-decorative-chars.sh",
+            "timeout": 10,
+            "statusMessage": "Checking for decorative characters..."
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/pre-bash-check.sh",
+            "timeout": 10,
+            "statusMessage": "Running pre-bash checks..."
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/tdd-guard.sh",
+            "timeout": 10,
+            "statusMessage": "Checking TDD compliance..."
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "CMD=$(jq -r '.tool_input.command'); echo \"$CMD\" | grep -qE '\\bgit\\b.*\\bpush\\b' || exit 0; DIR=$(echo \"$CMD\" | sed -nE 's/.*-C[[:space:]]+([^[:space:]]+).*/\\1/p'); if [ -n \"$DIR\" ]; then git -C \"$DIR\" pull --rebase; else git pull --rebase; fi",
+            "timeout": 30,
+            "statusMessage": "Pulling latest changes before push..."
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/check-claude-md.sh",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/workflow-enforce.sh",
+            "timeout": 10,
+            "statusMessage": "Enforcing prompt workflow..."
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline.sh"
+  },
+  "enabledPlugins": {
+    "claude-md-management@claude-plugins-official": true,
+    "code-simplifier@claude-plugins-official": false,
+    "commit-commands@claude-plugins-official": true,
+    "context7@claude-plugins-official": true,
+    "feature-dev@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true,
+    "github@claude-plugins-official": true,
+    "hookify@claude-plugins-official": false,
+    "mongodb@claude-plugins-official": false,
+    "playwright@claude-plugins-official": false,
+    "pr-review-toolkit@claude-plugins-official": true,
+    "pyright-lsp@claude-plugins-official": true,
+    "remember@claude-plugins-official": true,
+    "security-guidance@claude-plugins-official": true,
+    "sentry@claude-plugins-official": false,
+    "serena@claude-plugins-official": false,
+    "superpowers@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true
+  },
+  "theme": "dark",
+  "editorMode": "normal",
+  "mcpServers": {
+    "postgres": {
+      "command": "bash",
+      "args": [
+        "/Users/kamaldhital/.claude/hooks/postgres-mcp.sh"
+      ],
+      "timeout": 30
+    },
+    "github": {
+      "command": "bash",
+      "args": [
+        "-c",
+        "GITHUB_PERSONAL_ACCESS_TOKEN=$(gh auth token 2>/dev/null) node ~/.claude/mcp-servers/node_modules/@modelcontextprotocol/server-github/dist/index.js"
+      ],
+      "timeout": 30
+    }
+  },
+  "effortLevel": "max",
+  "includeCoAuthoredBy": false,
+  "cleanupPeriodDays": 30,
+  "preferredNotifChannel": "notifications_disabled"
+}

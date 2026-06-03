@@ -2,7 +2,7 @@
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-MODULES=(git zsh wezterm starship nvim)
+MODULES=(git zsh wezterm starship nvim claude)
 TIMESTAMP="$(date +%Y%m%d_%H%M%S)"
 
 if ! command -v brew >/dev/null 2>&1; then
@@ -30,6 +30,9 @@ backup_if_regular_file "$HOME/.gitconfig"
 backup_if_regular_file "$HOME/.config/starship.toml"
 backup_if_regular_file "$HOME/.config/wezterm/wezterm.lua"
 backup_if_regular_file "$HOME/.config/nvim/init.lua"
+backup_if_regular_file "$HOME/.claude/settings.json"
+backup_if_regular_file "$HOME/.claude/CLAUDE.md"
+backup_if_regular_file "$HOME/.claude/statusline.sh"
 
 for module in "${MODULES[@]}"; do
   stow "$module"
