@@ -43,7 +43,8 @@ config.window_background_opacity = 0.60
 config.keys = {
   -- Windows
   { key = 'n', mods = 'CMD', action = wezterm.action.SpawnWindow },
-  { key = 'w', mods = 'CMD', action = wezterm.action.CloseCurrentTab { confirm = false } },
+  -- Close current pane (closes window when last pane)
+  { key = 'w', mods = 'CMD', action = wezterm.action.CloseCurrentPane { confirm = false } },
   -- Font size
   { key = '+', mods = 'CMD', action = wezterm.action.IncreaseFontSize },
   { key = '-', mods = 'CMD', action = wezterm.action.DecreaseFontSize },
@@ -56,6 +57,30 @@ config.keys = {
   -- Scroll
   { key = 'UpArrow', mods = 'CMD', action = wezterm.action.ScrollToTop },
   { key = 'DownArrow', mods = 'CMD', action = wezterm.action.ScrollToBottom },
+  -- Panes: split (matches iTerm)
+  -- CMD+D opens a pane to the right, CMD+SHIFT+D opens a pane below
+  { key = 'd', mods = 'CMD', action = wezterm.action.SplitHorizontal { domain = 'CurrentPaneDomain' } },
+  { key = 'd', mods = 'CMD|SHIFT', action = wezterm.action.SplitVertical { domain = 'CurrentPaneDomain' } },
+  -- Panes: navigate with CMD+OPT+arrow
+  { key = 'LeftArrow', mods = 'CMD|OPT', action = wezterm.action.ActivatePaneDirection 'Left' },
+  { key = 'RightArrow', mods = 'CMD|OPT', action = wezterm.action.ActivatePaneDirection 'Right' },
+  { key = 'UpArrow', mods = 'CMD|OPT', action = wezterm.action.ActivatePaneDirection 'Up' },
+  { key = 'DownArrow', mods = 'CMD|OPT', action = wezterm.action.ActivatePaneDirection 'Down' },
+  -- Panes: resize with CMD+OPT+SHIFT+arrow
+  { key = 'LeftArrow', mods = 'CMD|OPT|SHIFT', action = wezterm.action.AdjustPaneSize { 'Left', 5 } },
+  { key = 'RightArrow', mods = 'CMD|OPT|SHIFT', action = wezterm.action.AdjustPaneSize { 'Right', 5 } },
+  { key = 'UpArrow', mods = 'CMD|OPT|SHIFT', action = wezterm.action.AdjustPaneSize { 'Up', 5 } },
+  { key = 'DownArrow', mods = 'CMD|OPT|SHIFT', action = wezterm.action.AdjustPaneSize { 'Down', 5 } },
+  -- Clear screen and scrollback
+  { key = 'k', mods = 'CMD', action = wezterm.action.ClearScrollback 'ScrollbackAndViewport' },
+  -- Toggle fullscreen (macOS standard)
+  { key = 'f', mods = 'CMD|CTRL', action = wezterm.action.ToggleFullScreen },
+  -- Copy mode (vim-style scrollback navigation)
+  { key = 'x', mods = 'CMD|SHIFT', action = wezterm.action.ActivateCopyMode },
+  -- Quick select (visually pick text without the mouse)
+  { key = ' ', mods = 'CMD|SHIFT', action = wezterm.action.QuickSelect },
+  -- Reload config (default exists, made explicit)
+  { key = 'r', mods = 'CMD|SHIFT', action = wezterm.action.ReloadConfiguration },
 }
 
 -- Mouse: auto-copy on selection, right-click pastes
