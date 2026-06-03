@@ -9,34 +9,6 @@ config.line_height = 1.1
 -- Color scheme (matches neovim tokyonight-night)
 config.color_scheme = 'Tokyo Night'
 
--- Tab bar colors matching Tokyo Night
-config.colors = {
-  tab_bar = {
-    background = '#1a1b26',
-    active_tab = {
-      bg_color = '#7aa2f7',
-      fg_color = '#1a1b26',
-      intensity = 'Bold',
-    },
-    inactive_tab = {
-      bg_color = '#1a1b26',
-      fg_color = '#565f89',
-    },
-    inactive_tab_hover = {
-      bg_color = '#24283b',
-      fg_color = '#c0caf5',
-    },
-    new_tab = {
-      bg_color = '#1a1b26',
-      fg_color = '#565f89',
-    },
-    new_tab_hover = {
-      bg_color = '#24283b',
-      fg_color = '#c0caf5',
-    },
-  },
-}
-
 -- Window
 config.window_padding = { left = 8, right = 8, top = 8, bottom = 8 }
 config.window_decorations = 'RESIZE'
@@ -44,12 +16,8 @@ config.window_close_confirmation = 'NeverPrompt'
 config.initial_cols = 220
 config.initial_rows = 50
 
--- Tab bar
-config.use_fancy_tab_bar = false
-config.tab_bar_at_bottom = false
-config.hide_tab_bar_if_only_one_tab = false
-config.tab_max_width = 32
-config.show_new_tab_button_in_tab_bar = true
+-- Disable tabs entirely
+config.enable_tab_bar = false
 
 -- Performance
 config.max_fps = 120
@@ -68,26 +36,14 @@ config.default_prog = { '/bin/zsh', '-l' }
 -- macOS
 config.send_composed_key_when_left_alt_is_pressed = false
 config.send_composed_key_when_right_alt_is_pressed = true
-config.macos_window_background_blur = 10
+config.macos_window_background_blur = 20
+config.window_background_opacity = 0.60
 
 -- Keybindings (matching macOS conventions)
 config.keys = {
-  -- Tabs
-  { key = 't', mods = 'CMD', action = wezterm.action.SpawnTab 'CurrentPaneDomain' },
-  { key = 'w', mods = 'CMD', action = wezterm.action.CloseCurrentTab { confirm = false } },
-  { key = ']', mods = 'CMD|SHIFT', action = wezterm.action.ActivateTabRelative(1) },
-  { key = '[', mods = 'CMD|SHIFT', action = wezterm.action.ActivateTabRelative(-1) },
-  { key = '1', mods = 'CMD', action = wezterm.action.ActivateTab(0) },
-  { key = '2', mods = 'CMD', action = wezterm.action.ActivateTab(1) },
-  { key = '3', mods = 'CMD', action = wezterm.action.ActivateTab(2) },
-  { key = '4', mods = 'CMD', action = wezterm.action.ActivateTab(3) },
-  { key = '5', mods = 'CMD', action = wezterm.action.ActivateTab(4) },
-  { key = '6', mods = 'CMD', action = wezterm.action.ActivateTab(5) },
-  { key = '7', mods = 'CMD', action = wezterm.action.ActivateTab(6) },
-  { key = '8', mods = 'CMD', action = wezterm.action.ActivateTab(7) },
-  { key = '9', mods = 'CMD', action = wezterm.action.ActivateTab(8) },
   -- Windows
   { key = 'n', mods = 'CMD', action = wezterm.action.SpawnWindow },
+  { key = 'w', mods = 'CMD', action = wezterm.action.CloseCurrentTab { confirm = false } },
   -- Font size
   { key = '+', mods = 'CMD', action = wezterm.action.IncreaseFontSize },
   { key = '-', mods = 'CMD', action = wezterm.action.DecreaseFontSize },

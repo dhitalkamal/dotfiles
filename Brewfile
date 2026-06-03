@@ -25,3 +25,4 @@ brew "zsh-autosuggestions"
 brew "zsh-syntax-highlighting"
 
 cask "wezterm"
+cask "font-jetbrains-mono-nerd-font"
