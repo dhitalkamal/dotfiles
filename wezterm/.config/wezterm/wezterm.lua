@@ -49,13 +49,47 @@ config.keys = {
   { key = '-', mods = 'CMD', action = wezterm.action.DecreaseFontSize },
   { key = '0', mods = 'CMD', action = wezterm.action.ResetFontSize },
   -- Clipboard
-  { key = 'c', mods = 'CMD', action = wezterm.action.CopyTo 'Clipboard' },
+  { key = 'c', mods = 'CMD', action = wezterm.action.CopyTo 'ClipboardAndPrimarySelection' },
   { key = 'v', mods = 'CMD', action = wezterm.action.PasteFrom 'Clipboard' },
   -- Search
   { key = 'f', mods = 'CMD', action = wezterm.action.Search { CaseSensitiveString = '' } },
   -- Scroll
   { key = 'UpArrow', mods = 'CMD', action = wezterm.action.ScrollToTop },
   { key = 'DownArrow', mods = 'CMD', action = wezterm.action.ScrollToBottom },
+}
+
+-- Mouse: auto-copy on selection, right-click pastes
+config.mouse_bindings = {
+  -- left-click release auto-copies selection to clipboard
+  {
+    event = { Up = { streak = 1, button = 'Left' } },
+    mods = 'NONE',
+    action = wezterm.action.CompleteSelection 'ClipboardAndPrimarySelection',
+  },
+  -- double-click selects word and copies
+  {
+    event = { Up = { streak = 2, button = 'Left' } },
+    mods = 'NONE',
+    action = wezterm.action.CompleteSelection 'ClipboardAndPrimarySelection',
+  },
+  -- triple-click selects line and copies
+  {
+    event = { Up = { streak = 3, button = 'Left' } },
+    mods = 'NONE',
+    action = wezterm.action.CompleteSelection 'ClipboardAndPrimarySelection',
+  },
+  -- ctrl-click on a link opens it
+  {
+    event = { Up = { streak = 1, button = 'Left' } },
+    mods = 'CMD',
+    action = wezterm.action.OpenLinkAtMouseCursor,
+  },
+  -- right-click pastes
+  {
+    event = { Down = { streak = 1, button = 'Right' } },
+    mods = 'NONE',
+    action = wezterm.action.PasteFrom 'Clipboard',
+  },
 }
 
 return config
