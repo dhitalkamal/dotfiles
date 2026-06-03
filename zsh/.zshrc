@@ -13,6 +13,9 @@ export TERM="xterm-256color"
 
 export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:/opt/homebrew/opt/postgresql@16/bin:$HOME/.local/bin:$PATH"
 
+# gpg needs to know which tty to use for passphrase prompts
+export GPG_TTY=$(tty)
+
 if command -v fnm >/dev/null 2>&1; then
   eval "$(fnm env --use-on-cd --shell zsh)"
 fi
