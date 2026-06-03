@@ -2,7 +2,7 @@
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-MODULES=(git zsh kitty starship nvim zellij)
+MODULES=(git zsh wezterm starship nvim)
 TIMESTAMP="$(date +%Y%m%d_%H%M%S)"
 
 if ! command -v brew >/dev/null 2>&1; then
@@ -28,16 +28,12 @@ backup_if_regular_file() {
 backup_if_regular_file "$HOME/.zshrc"
 backup_if_regular_file "$HOME/.gitconfig"
 backup_if_regular_file "$HOME/.config/starship.toml"
-backup_if_regular_file "$HOME/.config/kitty/kitty.conf"
-backup_if_regular_file "$HOME/.config/zellij/config.kdl"
+backup_if_regular_file "$HOME/.config/wezterm/wezterm.lua"
 backup_if_regular_file "$HOME/.config/nvim/init.lua"
 
 for module in "${MODULES[@]}"; do
   stow "$module"
 done
-
-echo "Cleaning old fish config (if present)..."
-rm -rf "$HOME/.config/fish"
 
 if [[ ! -f "$HOME/.gitconfig_device" ]]; then
   cat >"$HOME/.gitconfig_device" <<'EOF'

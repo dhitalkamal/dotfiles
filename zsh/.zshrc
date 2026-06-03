@@ -11,27 +11,7 @@ setopt SHARE_HISTORY INC_APPEND_HISTORY EXTENDED_HISTORY
 source "$ZSH/oh-my-zsh.sh"
 export TERM="xterm-256color"
 
-export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:/opt/homebrew/opt/postgresql@17/bin:$HOME/.local/bin:$HOME/.kiro:$PATH"
-
-if [[ -z "${KIRO_MCP_LOADED:-}" && -f "$HOME/.kiro/.env.mcp" ]]; then
-  while IFS= read -r line; do
-    [[ "$line" =~ ^[[:space:]]*$ ]] && continue
-    [[ "$line" =~ ^[[:space:]]*# ]] && continue
-    key="${line%%=*}"
-    value="${line#*=}"
-    [[ -z "$key" || "$key" == "$line" ]] && continue
-    export "$key=$value"
-  done < "$HOME/.kiro/.env.mcp"
-  export KIRO_MCP_LOADED=1
-fi
-
-export PYENV_ROOT="$HOME/.pyenv"
-if [[ -d "$PYENV_ROOT/bin" ]]; then
-  export PATH="$PYENV_ROOT/bin:$PATH"
-fi
-if command -v pyenv >/dev/null 2>&1; then
-  eval "$(pyenv init - zsh)"
-fi
+export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:/opt/homebrew/opt/postgresql@17/bin:$HOME/.local/bin:$PATH"
 
 if command -v fnm >/dev/null 2>&1; then
   eval "$(fnm env --use-on-cd --shell zsh)"
@@ -47,10 +27,6 @@ fi
 
 if command -v mcfly >/dev/null 2>&1; then
   eval "$(mcfly init zsh)"
-fi
-
-if command -v direnv >/dev/null 2>&1; then
-  eval "$(direnv hook zsh)"
 fi
 
 if command -v fd >/dev/null 2>&1; then
@@ -87,46 +63,6 @@ alias ...='cd ../..'
 alias ....='cd ../../..'
 alias fm='yazi'
 
-zz() {
-  if ! command -v zellij >/dev/null 2>&1; then
-    echo "zellij is not installed"
-    return 1
-  fi
-  local session="${1:-${PWD:t}}"
-  session="${session//[^[:alnum:]_-]/-}"
-  command zellij attach -c "$session"
-}
-
-zweb_start() {
-  if ! command -v zellij >/dev/null 2>&1; then
-    echo "zellij is not installed"
-    return 1
-  fi
-  local web_state
-  web_state="$(zellij web --status 2>&1 || true)"
-  if [[ "$web_state" != *"online"* ]]; then
-    zellij web --start --daemonize >/dev/null
-  fi
-  zellij web --status
-}
-
-zweb_stop() {
-  command -v zellij >/dev/null 2>&1 || { echo "zellij is not installed"; return 1; }
-  zellij web --stop
-}
-
-zshare() {
-  command -v zellij >/dev/null 2>&1 || { echo "zellij is not installed"; return 1; }
-  zweb_start >/dev/null || return 1
-  local out token
-  out="$(zellij web --create-token)"
-  token="$(printf '%s\n' "$out" | /usr/bin/sed -n 's/^token_[0-9][0-9]*: //p' | head -n1)"
-  printf '%s\n' "$out"
-  echo "Open: http://127.0.0.1:8082"
-  [[ -n "${ZELLIJ_SESSION_NAME:-}" ]] && echo "Current session: ${ZELLIJ_SESSION_NAME}" || echo "Tip: run zz first to enter your target session."
-  [[ -n "$token" ]] && echo "Token: $token"
-}
-
 alias g='git'
 alias gs='git status'
 alias ga='git add'
@@ -139,18 +75,7 @@ alias gb='git branch'
 alias glog='git log --oneline --graph --decorate'
 
 alias py='python'
-alias pip='pip'
 alias venv='python -m venv .venv'
-activate() {
-  if [[ -f ".venv/bin/activate" ]]; then
-    source ".venv/bin/activate"
-  elif [[ -f "venv/bin/activate" ]]; then
-    source "venv/bin/activate"
-  else
-    echo "No virtual environment found (.venv or venv)."
-    return 1
-  fi
-}
 
 alias pm='python manage.py'
 alias pmr='python manage.py runserver'
