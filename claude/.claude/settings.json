@@ -46,8 +46,6 @@
       "WebSearch",
       "Read(//Applications/Claude.app/Contents/Resources/**)",
       "Read(//Applications/Claude.app/Contents/MacOS/**)",
-      "Bash(git -C /Users/kamaldhital/Workspaces/Recruitables/rt-auth-service push)",
-      "Bash(git -C /Users/kamaldhital/Workspaces/Recruitables/rt-payment-service log --oneline -5)",
       "Bash(env -u VIRTUAL_ENV uv run --extra dev pre-commit run --all-files)",
       "WebFetch(domain:docs.airscale.io)",
       "WebFetch(domain:prospeo.io)",
@@ -55,9 +53,6 @@
       "WebFetch(domain:skywork.ai)",
       "Bash(./node_modules/.bin/tsc --noEmit)",
       "Bash(./node_modules/.bin/prettier --write src/features/candidate-sourcing/components/SearchHero.tsx src/features/candidate-sourcing/pages/CandidateSourcingPage.tsx)",
-      "Bash(cat /Users/kamaldhital/FYP/.claude/settings.json 2>/dev/null | head -50; cat /Users/kamaldhital/.claude/settings.json 2>/dev/null | head -50)",
-      "Read(//Users/Shared/.claude-config/**)",
-      "Bash(find /Users/kamaldhital/FYP -name \"settings.json\" -path \"*/.claude/*\" 2>/dev/null; find /Users/kamaldhital -maxdepth 3 -name \"settings.json\" -path \"*/.claude/*\" 2>/dev/null)",
       "Read(//Users/kamaldhital/**)",
       "Read(.env.example)",
       "Read(**/.env.example)",
@@ -84,8 +79,7 @@
     ],
     "defaultMode": "default",
     "additionalDirectories": [
-      "/Users/kamaldhital/Library/Application Support/Code/User",
-      "/Users/kamaldhital/FYP_DOCS"
+      "/Users/kamaldhital/Library/Application Support/Code/User"
     ]
   },
   "model": "claude-opus-4-6[1m]",
