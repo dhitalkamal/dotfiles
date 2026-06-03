@@ -11,7 +11,7 @@ setopt SHARE_HISTORY INC_APPEND_HISTORY EXTENDED_HISTORY
 source "$ZSH/oh-my-zsh.sh"
 export TERM="xterm-256color"
 
-export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:/opt/homebrew/opt/postgresql@17/bin:$HOME/.local/bin:$PATH"
+export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:/opt/homebrew/opt/postgresql@16/bin:$HOME/.local/bin:$PATH"
 
 if command -v fnm >/dev/null 2>&1; then
   eval "$(fnm env --use-on-cd --shell zsh)"
