@@ -77,7 +77,7 @@ Run formatters after every change. Never leave unformatted code.
 Branch off develop: feat/<slug>, fix/<slug>, or chore/<slug>.
 Never use "feature/" or any long-form prefix - stick to feat, fix, chore.
 Never commit directly to main, master, or develop.
-Never push to main, master, or develop. Push only feature branches and open a PR.
+Never push to main, master, or develop. Push only feat/fix/chore branches and open a PR.
 Never force push (--force, --force-with-lease, -f, +refspec). Never means never.
 Never add Co-Authored-By to commits.
 Commit messages: imperative mood, lowercase, under 72 chars.
