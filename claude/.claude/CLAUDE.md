@@ -68,6 +68,11 @@ Use only hyphens (-), periods, commas, colons, parens, brackets.
 No AI-speak ("This function efficiently handles...").
 Write like a developer leaving notes for a teammate.
 
+# File size
+Hard cap: 500 lines per file (every line counts, including blanks and comments).
+Soft warning at 300 lines. Split modules as they approach the cap.
+Exempted: lock files, generated/codegen output, minified bundles, migrations.
+
 # Formatting
 Python: ruff format . then ruff check --fix .
 JS/TS:  prettier --write .

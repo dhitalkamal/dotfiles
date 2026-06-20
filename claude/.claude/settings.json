@@ -79,6 +79,12 @@
             "command": "~/.claude/hooks/no-decorative-chars.sh",
             "timeout": 10,
             "statusMessage": "Checking for decorative characters..."
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/file-size-guard.sh",
+            "timeout": 10,
+            "statusMessage": "Checking file size..."
           }
         ]
       },
