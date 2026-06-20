@@ -34,26 +34,35 @@ fi
 
 # --- git commit checks (co-authored-by + branch) ---
 
-if echo "$CMD" | grep -qE '\bgit\b.*\bcommit\b'; then
+if echo "$CMD" | grep -qE '\bgit(\s+-C\s+\S+)?\s+commit\b'; then
   if echo "$CMD" | grep -qi "co-authored-by"; then
     block "Remove Co-Authored-By from the commit message. Rewrite the commit without it."
   fi
 
   BRANCH=$(git branch --show-current || echo "")
-  REPO_TOP=$(git rev-parse --show-toplevel 2>/dev/null || echo "")
-  # personal repos where direct main commits are fine
-  case "$REPO_TOP" in
-    "$HOME/dotfiles") BRANCH="" ;;
-  esac
   if [ -n "$BRANCH" ]; then
     case "$BRANCH" in
-      main|master)
-        block "Commits directly to ${BRANCH} are not allowed. Branch off develop: git checkout develop && git checkout -b feature/<slug>"
+      feat/*|fix/*|chore/*)
+        # allowed prefixes
         ;;
-      develop)
-        block "Commits directly to develop are not allowed. Create a feature branch: git checkout -b feature/<slug>"
+      *)
+        block "Commits allowed only on feat/<slug>, fix/<slug>, or chore/<slug>. Current branch: ${BRANCH}. Create one: git checkout develop && git checkout -b feat/<slug>"
         ;;
     esac
+  fi
+fi
+
+# --- git push force checks ---
+
+if echo "$CMD" | grep -qE '\bgit(\s+-C\s+\S+)?\s+push\b'; then
+  if echo "$CMD" | grep -qE '(--force|--force-with-lease|--force-if-includes)'; then
+    block "Force push is not allowed. Never. Push without --force."
+  fi
+  if echo "$CMD" | grep -qE '\bgit(\s+-C\s+\S+)?\s+push\b.*\s-[a-zA-Z]*f[a-zA-Z]*\b'; then
+    block "Force push is not allowed (short -f flag detected). Never."
+  fi
+  if echo "$CMD" | grep -qE '\bgit(\s+-C\s+\S+)?\s+push\b.*\s\+\S'; then
+    block "Force push via +refspec is not allowed. Never."
   fi
 fi
 
@@ -74,8 +83,8 @@ if echo "$UPPER_CMD" | grep -qE '\bDELETE\s+FROM\b' && ! echo "$UPPER_CMD" | gre
 fi
 
 if echo "$CMD" | grep -qE 'rm\s+-[a-zA-Z]*r[a-zA-Z]*f|rm\s+-[a-zA-Z]*f[a-zA-Z]*r'; then
-  if echo "$CMD" | grep -qE '(rm\s+.*(/\s*$|~\s*$|\$HOME))|(rm\s+.*-rf\s+/)'; then
-    block "Blocked: rm -rf on root or home directory detected."
+  if echo "$CMD" | grep -qE '(rm\s+.*(/\s*$|~\s*$|\$HOME))|(rm\s+.*-rf\s+(/|\.{1,2}(\s|$)|\*))'; then
+    block "Blocked: rm -rf on dangerous target (root, home, current/parent dir, or wildcard) detected."
   fi
 fi
 

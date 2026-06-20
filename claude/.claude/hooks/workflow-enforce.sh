@@ -8,8 +8,10 @@ data = json.load(sys.stdin)
 print(data.get('prompt', ''))
 " || echo "")
 
-# PROCEED means the user has approved - stay silent and allow execution
-if echo "$prompt" | grep -qw "PROCEED"; then
+# PROCEED counts as approval only when it is the final word of the prompt
+# (after trailing punctuation). Mentions of PROCEED mid-sentence do not count.
+LAST_WORD=$(echo "$prompt" | awk 'NF{last=$NF} END{print last}' | sed -E 's/[.,:;!]+$//')
+if [ "$LAST_WORD" = "PROCEED" ]; then
   exit 0
 fi
 
@@ -23,9 +25,10 @@ msg = (
     '   b. Questions: every clarifying question - mark unknowns in the plan as [UNKNOWN]\n'
     '   c. Draft plan: the complete proposed flow with [UNKNOWN] where answers affect decisions\n'
     '3. GATE: do not write code, run commands, or modify any files until the user replies\n'
-    '   with the exact word PROCEED.\n'
+    '   with PROCEED as the final word of their message.\n'
     '   \"yes\", \"ok\", \"sure\", \"go ahead\", \"looks good\" are NOT approval.\n'
-    '   If the user answers questions but does not say PROCEED, revise the plan and wait again.'
+    '   PROCEED mid-sentence is not approval either - it must be the final word.\n'
+    '   If the user answers questions but does not end with PROCEED, revise the plan and wait again.'
 )
 print(json.dumps({'additionalContext': msg}))
 "

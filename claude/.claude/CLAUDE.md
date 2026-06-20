@@ -12,10 +12,19 @@ you assume. You build only what is asked.
 3. Gate: do NOT write code, run commands, or modify files until the user replies
    with the exact word PROCEED. "yes", "ok", "go ahead" are NOT approval.
    If the user answers questions but omits PROCEED, revise the plan and wait again.
+4. This gate applies even when settings runs in auto permission mode.
+   Only proceed on the exact word PROCEED.
+
+# Memory
+Never write to memory unless the user uses the REMEMBER keyword (uppercase) in their message.
+"REMEMBER X" is the only signal to save a memory entry. "remember" lowercase, "save this",
+or implicit hints do not count.
+Memory writes are file modifications and gated by PROCEED like any other write.
 
 # Package managers
-Python: uv run only. Never pip, python, or pip3.
-JS/TS:  yarn only. Never npm or npx.
+Python: uv run for scripts. uv add for installing. python manage.py for Django.
+JS/TS:  yarn.
+Defer to project conventions when set - check pyproject.toml or package.json.
 
 # Architecture - hexagonal, always
 Layers: domain -> application -> infrastructure -> presentation
@@ -47,11 +56,14 @@ re-raised with context.
 
 # Comments and writing style
 Comment everything non-obvious. Plain lowercase labels.
-ZERO decoration anywhere (code, comments, docs, memory).
-ASCII punctuation only.
-Forbidden: em dashes, en dashes, arrows (any direction),
+ZERO decoration in files (code, comments, docs, memory).
+ASCII punctuation only in files.
+Chat output may use markdown (lists, emphasis, headers) for readability
+since it renders in the terminal.
+Forbidden in files: em dashes, en dashes, Unicode arrows (U+2190 to U+21FF),
 bullets, box-drawing chars, smart quotes, ellipsis,
 emojis, ASCII art, decorative separators (=== --- *** banners).
+ASCII arrows like -> are fine.
 Use only hyphens (-), periods, commas, colons, parens, brackets.
 No AI-speak ("This function efficiently handles...").
 Write like a developer leaving notes for a teammate.
@@ -62,8 +74,11 @@ JS/TS:  prettier --write .
 Run formatters after every change. Never leave unformatted code.
 
 # Git
-Branch off develop: feature/<slug>
-Never push to main or develop directly.
+Branch off develop: feat/<slug>, fix/<slug>, or chore/<slug>.
+Never use "feature/" or any long-form prefix - stick to feat, fix, chore.
+Never commit directly to main, master, or develop.
+Never push to main, master, or develop. Push only feature branches and open a PR.
+Never force push (--force, --force-with-lease, -f, +refspec). Never means never.
 Never add Co-Authored-By to commits.
 Commit messages: imperative mood, lowercase, under 72 chars.
 
@@ -71,14 +86,3 @@ Commit messages: imperative mood, lowercase, under 72 chars.
 Always validate via serializers first.
 Consistent shape: {data, error, meta}
 Correct HTTP status codes - 400 for client errors, not 500.
-
-# DB - 7 services, each owns its schema
-rt-auth         -> auth schema        (users, sessions, permissions)
-rt-core-ats     -> ats schema         (jobs, applications, candidates)
-rt-payment      -> payment schema     (orders, invoices, subscriptions)
-rt-chat         -> chat schema        (messages, threads, participants)
-rt-contract     -> contract schema    (contracts, signatures, terms)
-rt-analytics    -> analytics schema   (events, metrics, reports)
-rt-audit        -> audit schema       (logs, trails, snapshots)
-Never cross-schema joins in application code.
-Migrations via manage.py - always ask before running.

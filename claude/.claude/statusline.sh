@@ -4,7 +4,7 @@ import json, sys, subprocess
 
 try:
     data = json.load(sys.stdin)
-except Exception:
+except (json.JSONDecodeError, ValueError):
     data = {}
 
 ctx      = data.get('context_window') or {}
@@ -17,7 +17,7 @@ try:
         ['git', 'branch', '--show-current'],
         stderr=subprocess.DEVNULL, text=True
     ).strip()
-except Exception:
+except (subprocess.CalledProcessError, FileNotFoundError):
     branch = ''
 
 GREEN  = '\033[32m'
