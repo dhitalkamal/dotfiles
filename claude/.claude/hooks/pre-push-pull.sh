@@ -28,6 +28,16 @@ else
   GIT_CMD=(git)
 fi
 
+# skip pull when the current branch has no upstream tracking
+# (typical for a first-time push of a new branch)
+BRANCH=$("${GIT_CMD[@]}" branch --show-current || echo "")
+if [ -n "$BRANCH" ]; then
+  REMOTE=$("${GIT_CMD[@]}" config --get "branch.${BRANCH}.remote" || true)
+  if [ -z "$REMOTE" ]; then
+    exit 0
+  fi
+fi
+
 # attempt pull --rebase, capture combined output
 if ! OUTPUT=$("${GIT_CMD[@]}" pull --rebase 2>&1); then
   # abort the partial rebase if one is in progress
