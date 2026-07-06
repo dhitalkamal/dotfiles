@@ -56,6 +56,7 @@ EXEMPT_DIRS = {
     '.next',
     'out',
     'vendor',
+    'settings',
 }
 
 basename = os.path.basename(file_path)
@@ -67,8 +68,15 @@ parts = set(file_path.split('/'))
 if parts & EXEMPT_DIRS:
     sys.exit(0)
 
+current_line_count = 0  # before the edit; 0 for new files
 if tool == 'Write':
     content = ti.get('content', '')
+    if os.path.exists(file_path):
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                current_line_count = len(f.read().splitlines())
+        except (UnicodeDecodeError, OSError):
+            current_line_count = 0
 elif tool == 'Edit':
     if not os.path.exists(file_path):
         sys.exit(0)
@@ -77,6 +85,7 @@ elif tool == 'Edit':
             current = f.read()
     except (UnicodeDecodeError, OSError):
         sys.exit(0)
+    current_line_count = len(current.splitlines())
     old_string = ti.get('old_string', '')
     new_string = ti.get('new_string', '')
     replace_all = ti.get('replace_all', False)
@@ -93,14 +102,30 @@ line_count = len(content.splitlines())
 
 SOFT = 300
 HARD = 500
+LEGACY_GROWTH_TOLERANCE = 50
 
-if line_count >= HARD:
-    msg = (
-        f'File size limit exceeded: {line_count} lines (hard limit {HARD}). '
-        f'Split this file into smaller modules. Path: {file_path}'
-    )
+is_legacy = current_line_count > HARD
+under_hard = line_count <= HARD
+legacy_within_tolerance = (
+    is_legacy and line_count <= current_line_count + LEGACY_GROWTH_TOLERANCE
+)
+
+if line_count >= HARD and not under_hard and not legacy_within_tolerance:
+    if is_legacy:
+        msg = (
+            f'Legacy file at {current_line_count} lines is growing by '
+            f'{line_count - current_line_count} - exceeds tolerance of '
+            f'{LEGACY_GROWTH_TOLERANCE}. Split before adding more. '
+            f'Path: {file_path}'
+        )
+    else:
+        msg = (
+            f'File size limit exceeded: {line_count} lines (hard limit '
+            f'{HARD}). Split this file into smaller modules. '
+            f'Path: {file_path}'
+        )
     print(json.dumps({'decision': 'block', 'reason': msg}))
-elif line_count >= SOFT:
+elif line_count >= SOFT and not is_legacy:
     msg = (
         f'WARNING: file at {line_count} lines, over soft limit {SOFT}. '
         f'Hard limit is {HARD}. Consider splitting. Path: {file_path}'

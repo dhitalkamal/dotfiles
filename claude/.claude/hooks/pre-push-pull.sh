@@ -1,10 +1,10 @@
 #!/bin/bash
 set -euo pipefail
 
-# pulls latest changes (with rebase) before any git push
+# fast-forwards local to remote before any git push (no rebase, no merge)
 # supports git -C <dir> push as well
 # skips force pushes (they are blocked by pre-bash-check.sh)
-# on conflict: aborts the partial rebase and emits a block message
+# on non-ff: emits a block message and lets the human decide how to integrate
 
 INPUT=$(cat)
 CMD=$(echo "$INPUT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('tool_input',{}).get('command',''))" || echo "")
@@ -39,10 +39,7 @@ if [ -n "$BRANCH" ]; then
 fi
 
 # attempt pull --rebase, capture combined output
-if ! OUTPUT=$("${GIT_CMD[@]}" pull --rebase 2>&1); then
-  # abort the partial rebase if one is in progress
-  "${GIT_CMD[@]}" rebase --abort || true
-
+if ! OUTPUT=$("${GIT_CMD[@]}" pull --ff-only 2>&1); then
   export OUTPUT
   python3 -c "
 import json, os
