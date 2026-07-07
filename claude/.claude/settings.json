@@ -10,9 +10,9 @@
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
     "CLAUDE_HEADLESS_LOG_DIR": "/Users/kamaldhital/.claude/logs/headless",
     "CLAUDE_PENDING_DIR": "/Users/kamaldhital/.claude/pending",
-    "CLAUDE_ROUTINES_DIR": "/Users/kamaldhital/dotfiles/claude/.claude/routines",
-    "CLAUDE_HEADLESS_DIR": "/Users/kamaldhital/dotfiles/claude/.claude/headless",
-    "CLAUDE_EVALS_DIR": "/Users/kamaldhital/dotfiles/claude/.claude/evals",
+    "CLAUDE_ROUTINES_DIR": "/Users/kamaldhital/.claude/routines",
+    "CLAUDE_HEADLESS_DIR": "/Users/kamaldhital/.claude/headless",
+    "CLAUDE_EVALS_DIR": "/Users/kamaldhital/.claude/evals",
     "CLAUDE_ORCHESTRATION_DIR": "/Users/kamaldhital/.claude/orchestration"
   },
   "includeCoAuthoredBy": false,

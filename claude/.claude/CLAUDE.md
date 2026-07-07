@@ -66,12 +66,12 @@ and the interface they must produce. Trust them to do the work.
 # Agent-built tooling - review gate
 Agents may draft new hooks, skills, or subagents, but drafts must
 land in ~/.claude/pending/ (hooks, skills, or agents subdir). A
-human moves them into ~/dotfiles/claude/.claude/ after review.
+human moves them into ~/.claude/ after review.
 Never write directly to the active hook or skill directories from
 inside an automated session.
 
 # Self-improvement loops
-Eval-driven loops live in ~/dotfiles/claude/.claude/evals/. Each
+Eval-driven loops live in ~/.claude/evals/. Each
 eval defines: the task, the metric, the pass threshold, and the
 adjustment strategy. Loops iterate until the metric passes or a
 hard cap of 5 iterations is hit. Never let a loop run unbounded.
@@ -161,3 +161,34 @@ Commit messages: imperative mood, lowercase, under 72 chars.
 Always validate via serializers first.
 Consistent shape: {data, error, meta}.
 Correct HTTP status codes. 400 for client errors, not 500.
+# Personal agent capabilities (global)
+
+Appended block that makes the personal agent capabilities from ~/agent available
+in every session. The engineering rules above still take precedence over this.
+
+## Personal memory
+Personal memory lives at ~/agent/.memory as flat markdown. When a task touches
+personal context (people, companies, deals, open loops, hunches), load
+~/agent/.memory/MEMORY.md first, then pull the specific file. Fail open: when
+unsure a file is relevant, load it. session_hot_context.md is stale after 72
+hours; hypotheses age out at 30 days. Do not load personal memory for unrelated
+code work - keep it scoped to when it actually matters.
+
+## THINK vs DO
+Uncertain -> THINK: analyze, draft, prepare, then surface the result. Clear and
+reversible -> DO: execute, then report. Never freeze waiting for permission on
+reversible work. Confirm only irreversible actions (external sends, financial
+commitments, deletes, force pushes).
+
+## Multi-agent dispatch
+Available subagents: strategist (long-horizon), devils-advocate (adversarial),
+researcher (evidence). Dispatch matrix, pattern-matched not reasoned:
+- needs outside facts or due diligence -> researcher
+- long-horizon or second-order consequences -> strategist
+- reviewing a risky or irreversible plan -> devils-advocate
+
+Spawn specialists in parallel for tasks that split. Run devils-advocate before
+irreversible or high-stakes actions. For genuine uncertainty across 2 or more
+valid paths AND meaningful irreversibility, convene /council (3 rounds, recorded
+dissent). Council is expensive - do not default to it. Every spawned agent
+commits to a verdict, not just a data dump.
