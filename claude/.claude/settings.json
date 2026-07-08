@@ -1,101 +1,114 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "cleanupPeriodDays": 14,
   "env": {
     "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "70",
     "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
-    "CLAUDE_CODE_SUBAGENT_MODEL": "sonnet",
     "MAX_MCP_OUTPUT_TOKENS": "20000",
     "EDITOR": "code --wait",
-    "VISUAL": "code --wait"
+    "VISUAL": "code --wait",
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "CLAUDE_HEADLESS_LOG_DIR": "/Users/kamaldhital/.claude/logs/headless",
+    "CLAUDE_PENDING_DIR": "/Users/kamaldhital/.claude/pending",
+    "CLAUDE_ROUTINES_DIR": "/Users/kamaldhital/.claude/routines",
+    "CLAUDE_HEADLESS_DIR": "/Users/kamaldhital/.claude/headless",
+    "CLAUDE_EVALS_DIR": "/Users/kamaldhital/.claude/evals",
+    "CLAUDE_ORCHESTRATION_DIR": "/Users/kamaldhital/.claude/orchestration"
   },
+  "includeCoAuthoredBy": false,
   "permissions": {
     "allow": [
-      "Bash(python *)",
-      "Bash(python3 *)",
       "Bash(uv run *)",
       "Bash(uv pip *)",
       "Bash(uv sync *)",
       "Bash(uv add *)",
+      "Bash(python manage.py *)",
+      "Bash(python3 manage.py *)",
       "Bash(yarn *)",
-      "Bash(yarn dev)",
-      "Bash(yarn build)",
-      "Bash(yarn test *)",
-      "Bash(yarn lint *)",
       "Bash(git status)",
       "Bash(git log *)",
       "Bash(git diff *)",
       "Bash(git branch *)",
       "Bash(git stash *)",
       "Bash(git fetch *)",
-      "Bash(git checkout -b *)",
-      "Bash(git checkout develop)",
-      "Bash(git checkout feature/*)",
-      "Bash(git checkout main)",
+      "Bash(git checkout *)",
+      "Bash(git worktree *)",
       "Bash(docker ps *)",
       "Bash(docker logs *)",
       "Bash(docker-compose ps)",
       "Bash(docker-compose logs *)",
+      "Bash(docker-compose up *)",
+      "Bash(docker-compose down *)",
       "Bash(uv run python manage.py showmigrations *)",
       "Bash(uv run python manage.py migrate --check)",
+      "Bash(env -u VIRTUAL_ENV uv run --extra dev pre-commit run --all-files)",
+      "Bash(brew install *)",
+      "Bash(flutter clean *)",
+      "Bash(claude -p *)",
+      "Bash(gh pr *)",
+      "Bash(gh issue *)",
+      "Bash(gh run *)",
+      "Bash(gh workflow *)",
+      "Bash(gh api *)",
+      "Bash(jq *)",
+      "Bash(mkdir -p *)",
+      "Bash(ls *)",
       "Read(package.json)",
       "Read(pyproject.toml)",
       "Read(tsconfig.json)",
       "Read(CLAUDE.md)",
       "Read(.gitignore)",
       "Read(README.md)",
-      "WebSearch",
-      "Read(//Applications/Claude.app/Contents/Resources/**)",
-      "Read(//Applications/Claude.app/Contents/MacOS/**)",
-      "Bash(env -u VIRTUAL_ENV uv run --extra dev pre-commit run --all-files)",
-      "WebFetch(domain:docs.airscale.io)",
-      "WebFetch(domain:prospeo.io)",
-      "WebFetch(domain:syncgtm.com)",
-      "WebFetch(domain:skywork.ai)",
-      "Bash(./node_modules/.bin/tsc --noEmit)",
-      "Bash(./node_modules/.bin/prettier --write src/features/candidate-sourcing/components/SearchHero.tsx src/features/candidate-sourcing/pages/CandidateSourcingPage.tsx)",
-      "Read(//Users/kamaldhital/**)",
       "Read(.env.example)",
       "Read(**/.env.example)",
-      "Bash(git checkout *)",
-      "Bash(uv run python manage.py migrate *)",
-      "Bash(brew install *)",
-      "Bash(docker-compose up *)",
-      "Bash(docker-compose down *)",
-      "Bash(flutter clean *)"
+      "Read(/Users/kamaldhital/**)",
+      "Write(/Users/kamaldhital/.claude/logs/**)",
+      "Write(/Users/kamaldhital/.claude/pending/**)",
+      "Write(/Users/kamaldhital/.claude/orchestration/**)",
+      "WebSearch"
     ],
     "deny": [
       "Bash(git reset --hard)",
       "Bash(git push --force)",
+      "Bash(git push -f)",
+      "Bash(git push --force-with-lease)",
       "Bash(docker system prune *)",
       "Read(services_credentials/*)",
       "Read(**/secrets/**)",
       "Read(.env*)",
-      "Read(**/.env*)"
+      "Read(**/.env*)",
+      "Read(**/.ssh/**)",
+      "Read(**/.aws/credentials)",
+      "Read(**/credentials.json)",
+      "Write(/Users/kamaldhital/dotfiles/claude/.claude/hooks/**)",
+      "Write(/Users/kamaldhital/dotfiles/claude/.claude/agents/**)",
+      "Write(/Users/kamaldhital/dotfiles/claude/.claude/CLAUDE.md)",
+      "Write(/Users/kamaldhital/dotfiles/claude/.claude/settings.json)"
     ],
     "ask": [
       "Bash(git push *)",
       "Bash(git commit *)",
-      "Bash(git clone *)"
+      "Bash(git clone *)",
+      "Bash(uv run python manage.py migrate *)",
+      "Bash(gh pr merge *)",
+      "Bash(gh release create *)"
     ],
-    "defaultMode": "default",
-    "additionalDirectories": [
-      "/Users/kamaldhital/Library/Application Support/Code/User"
-    ]
+    "defaultMode": "auto"
   },
-  "model": "claude-opus-4-6[1m]",
+  "enableAllProjectMcpServers": true,
   "hooks": {
     "SessionStart": [
       {
         "hooks": [
           {
             "type": "command",
-            "command": "mkdir -p \"${CLAUDE_PROJECT_DIR:-.}/.remember/logs\"",
+            "command": "~/.claude/hooks/detect-exec-mode.sh",
             "timeout": 5
           }
         ]
       }
     ],
-    "PostToolUse": [
+    "PreToolUse": [
       {
         "matcher": "Write|Edit",
         "hooks": [
@@ -104,11 +117,21 @@
             "command": "~/.claude/hooks/no-decorative-chars.sh",
             "timeout": 10,
             "statusMessage": "Checking for decorative characters..."
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/file-size-guard.sh",
+            "timeout": 10,
+            "statusMessage": "Checking file size..."
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/agent-tooling-guard.sh",
+            "timeout": 10,
+            "statusMessage": "Checking tooling write gate..."
           }
         ]
-      }
-    ],
-    "PreToolUse": [
+      },
       {
         "matcher": "Bash",
         "hooks": [
@@ -117,28 +140,24 @@
             "command": "~/.claude/hooks/pre-bash-check.sh",
             "timeout": 10,
             "statusMessage": "Running pre-bash checks..."
-          }
-        ]
-      },
-      {
-        "matcher": "Write",
-        "hooks": [
+          },
           {
             "type": "command",
-            "command": "~/.claude/hooks/tdd-guard.sh",
-            "timeout": 10,
-            "statusMessage": "Checking TDD compliance..."
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "CMD=$(jq -r '.tool_input.command'); echo \"$CMD\" | grep -qE '\\bgit\\b.*\\bpush\\b' || exit 0; DIR=$(echo \"$CMD\" | sed -nE 's/.*-C[[:space:]]+([^[:space:]]+).*/\\1/p'); if [ -n \"$DIR\" ]; then git -C \"$DIR\" pull --rebase; else git pull --rebase; fi",
+            "command": "~/.claude/hooks/pre-push-pull.sh",
             "timeout": 30,
-            "statusMessage": "Pulling latest changes before push..."
+            "statusMessage": "Pulling latest before push..."
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash|Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/log-headless-action.sh",
+            "timeout": 5
           }
         ]
       }
@@ -159,7 +178,29 @@
           }
         ]
       }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/headless-stop-report.sh",
+            "timeout": 10
+          }
+        ]
+      }
     ]
+  },
+  "worktree": {
+    "symlinkDirectories": [
+      ".cache",
+      ".pnpm-store",
+      ".yarn/cache",
+      ".uv-cache",
+      "node_modules"
+    ],
+    "baseRef": "fresh",
+    "bgIsolation": "worktree"
   },
   "statusLine": {
     "type": "command",
@@ -167,45 +208,32 @@
   },
   "enabledPlugins": {
     "claude-md-management@claude-plugins-official": true,
-    "code-simplifier@claude-plugins-official": false,
     "commit-commands@claude-plugins-official": true,
     "context7@claude-plugins-official": true,
     "feature-dev@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,
     "github@claude-plugins-official": true,
-    "hookify@claude-plugins-official": false,
-    "mongodb@claude-plugins-official": false,
-    "playwright@claude-plugins-official": false,
     "pr-review-toolkit@claude-plugins-official": true,
     "pyright-lsp@claude-plugins-official": true,
     "remember@claude-plugins-official": true,
     "security-guidance@claude-plugins-official": true,
-    "sentry@claude-plugins-official": false,
-    "serena@claude-plugins-official": false,
     "superpowers@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true
   },
-  "theme": "dark",
-  "editorMode": "normal",
-  "mcpServers": {
-    "postgres": {
-      "command": "bash",
-      "args": [
-        "/Users/kamaldhital/.claude/hooks/postgres-mcp.sh"
-      ],
-      "timeout": 30
-    },
-    "github": {
-      "command": "bash",
-      "args": [
-        "-c",
-        "GITHUB_PERSONAL_ACCESS_TOKEN=$(gh auth token 2>/dev/null) node ~/.claude/mcp-servers/node_modules/@modelcontextprotocol/server-github/dist/index.js"
-      ],
-      "timeout": 30
+  "extraKnownMarketplaces": {
+    "cotal-mesh": {
+      "source": {
+        "source": "directory",
+        "path": "/Users/kamaldhital/.cotal/claude-plugin"
+      }
     }
   },
-  "effortLevel": "max",
-  "includeCoAuthoredBy": false,
-  "cleanupPeriodDays": 30,
-  "preferredNotifChannel": "notifications_disabled"
+  "theme": "dark",
+  "editorMode": "normal",
+  "preferredNotifChannel": "notifications_disabled",
+  "teammateMode": "in-process",
+  "skipAutoPermissionPrompt": true,
+  "useAutoModeDuringPlan": true,
+  "language": "english",
+  "respectGitignoreForContext": true
 }

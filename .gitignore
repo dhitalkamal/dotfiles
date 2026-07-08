@@ -5,3 +5,4 @@ nvim/.config/nvim/.repro/
 # local files
 *.local
 .DS_Store
+/agent/
