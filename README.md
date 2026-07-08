@@ -4,12 +4,12 @@ Personal macOS dev environment with a clean, conflict-free toolchain.
 
 ## included
 
-- zsh config
-- kitty terminal
+- zsh config (starship prompt, fzf + fzf-tab, mcfly ctrl-r, zoxide, direnv, modern cli aliases)
+- wezterm terminal
 - starship prompt
 - neovim config
-- git config
-- zellij config
+- git config (delta pager)
+- macos defaults (keyboard + finder), applied by setup.sh via macos/defaults.sh
 - Brewfile + one-command setup
 
 ## quick setup
@@ -24,7 +24,7 @@ cd ~/dotfiles
 
 ```bash
 brew bundle --file Brewfile
-stow git zsh kitty starship nvim zellij
+stow git zsh wezterm starship nvim claude warp
 ```
 
 Create `~/.gitconfig_device` if missing:
