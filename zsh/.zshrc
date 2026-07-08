@@ -20,10 +20,6 @@ if command -v fnm >/dev/null 2>&1; then
   eval "$(fnm env --use-on-cd --shell zsh)"
 fi
 
-if command -v zoxide >/dev/null 2>&1; then
-  eval "$(zoxide init zsh)"
-fi
-
 if command -v starship >/dev/null 2>&1; then
   eval "$(starship init zsh)"
 fi
@@ -57,7 +53,6 @@ alias top='btop'
 alias pps='procs'
 alias du='dust'
 alias df='duf'
-alias sed='sd'
 alias help='tldr'
 alias vim='nvim'
 alias vi='nvim'
@@ -98,6 +93,19 @@ alias dkup='docker compose up -d'
 alias dkdown='docker compose down'
 alias dkbuild='docker compose build'
 
+# reveal in finder. f opens cwd; f dir opens folder; f file selects it in finder.
+f() {
+  if [ $# -eq 0 ]; then
+    open .
+  elif [ -d "$1" ]; then
+    open "$1"
+  elif [ -f "$1" ]; then
+    open -R "$1"
+  else
+    open "$1"
+  fi
+}
+
 if [[ -f /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then
   source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 fi
@@ -105,3 +113,15 @@ fi
 if [[ -f /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
   source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 fi
+
+if command -v zoxide >/dev/null 2>&1; then
+  eval "$(zoxide init zsh)"
+fi
+
+# pnpm
+export PNPM_HOME="/Users/kamaldhital/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME/bin:"*) ;;
+  *) export PATH="$PNPM_HOME/bin:$PATH" ;;
+esac
+# pnpm end
