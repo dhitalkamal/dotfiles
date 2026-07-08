@@ -64,4 +64,9 @@ if [[ "$CURRENT_LOGIN_SHELL" != "/bin/zsh" ]]; then
   echo "  chsh -s /bin/zsh"
 fi
 
+if [[ "$(uname)" == "Darwin" && -f "$REPO_DIR/macos/defaults.sh" ]]; then
+  echo "Applying macOS defaults..."
+  bash "$REPO_DIR/macos/defaults.sh"
+fi
+
 echo "Done. Reload shell with: exec zsh -l"
