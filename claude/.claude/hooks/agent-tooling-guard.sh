@@ -2,8 +2,27 @@
 # blocks writes to active tooling dirs.
 # proposed hooks, skills, or agents must land in ~/.claude/pending/ instead.
 # reads tool input from stdin as json.
+#
+# 2026-08-13: only enforced in headless/routine/ci. interactive sessions are
+# already human-supervised turn by turn, so the gate no longer blocks those.
+# same session/mode-detection idiom as log-headless-action.sh.
 
 set -euo pipefail
+
+session_id="${CLAUDE_SESSION_ID:-$$}"
+env_file="${HOME}/.claude/session-env/${session_id}.env"
+
+mode="interactive"
+if [ -f "$env_file" ]; then
+    # shellcheck disable=SC1090
+    . "$env_file"
+    mode="${CLAUDE_EXEC_MODE:-interactive}"
+fi
+
+if [ "$mode" = "interactive" ]; then
+    cat >/dev/null 2>&1 || true
+    exit 0
+fi
 
 input=$(cat)
 
@@ -45,10 +64,10 @@ protected_prefixes=(
 for prefix in "${protected_prefixes[@]}"; do
     case "$abs" in
         "$prefix"*|"$prefix")
-            reason="write to active tooling path is gated. drop the draft in ~/.claude/pending/ (hooks|skills|agents subdir) and ask a human to promote it. blocked path: ${abs}"
-            cat <<EOF
+            reason="write to active tooling path is gated outside interactive sessions. drop the draft in ~/.claude/pending/ (hooks|skills|agents subdir) and ask a human to promote it. blocked path: ${abs}"
+            cat <<EOF2
 {"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"${reason}"}}
-EOF
+EOF2
             exit 0
             ;;
     esac
