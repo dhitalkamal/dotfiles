@@ -1,22 +1,25 @@
 return {
-  -- Colorscheme
   {
-    "folke/tokyonight.nvim",
-    opts = {
-      style = "night",
-      transparent = false,
-      styles = {
-        sidebars = "dark",
-        floats = "dark",
-      },
-    },
-  },
-
-  -- Configure LazyVim to load tokyonight
-  {
-    "LazyVim/LazyVim",
-    opts = {
-      colorscheme = "tokyonight-night",
-    },
+    "catppuccin/nvim",
+    name = "catppuccin",
+    priority = 1000,
+    config = function()
+      require("catppuccin").setup({
+        flavour = "mocha",
+        integrations = {
+          neotree = true,
+          telescope = true,
+          gitsigns = true,
+          treesitter = true,
+          cmp = true,
+          mason = true,
+          which_key = true,
+          alpha = true,
+          native_lsp = { enabled = true },
+          indent_blankline = { enabled = true },
+        },
+      })
+      vim.cmd.colorscheme("catppuccin-mocha")
+    end,
   },
 }
