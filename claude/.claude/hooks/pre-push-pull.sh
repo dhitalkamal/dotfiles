@@ -3,7 +3,8 @@ set -euo pipefail
 
 # fast-forwards local to remote before any git push (no rebase, no merge)
 # supports git -C <dir> push as well
-# skips force pushes (they are blocked by pre-bash-check.sh)
+# skips force pushes (they are blocked by the permissions deny list in
+# settings.json - git push --force*, -f, and +refspec forms)
 # on non-ff: emits a block message and lets the human decide how to integrate
 #
 # 2026-08-12 fix: a bare `git push` (no -C, no leading `cd`) previously fell back
@@ -51,7 +52,7 @@ HOOK_CWD=$(echo "$INPUT" | python3 -c "import sys,json; d=json.load(sys.stdin); 
 # only run for git push commands (push must be the subcommand, not a filename substring)
 echo "$CMD" | grep -qE '\bgit(\s+-C\s+\S+)?\s+push\b' || exit 0
 
-# skip force pushes - they should be blocked by pre-bash-check.sh
+# skip force pushes - they are blocked by the settings.json deny list
 echo "$CMD" | grep -qE '(--force|--force-with-lease|--force-if-includes)' && exit 0
 echo "$CMD" | grep -qE '\bgit(\s+-C\s+\S+)?\s+push\b.*\s-[a-zA-Z]*f[a-zA-Z]*\b' && exit 0
 echo "$CMD" | grep -qE '\bgit(\s+-C\s+\S+)?\s+push\b.*\s\+\S' && exit 0

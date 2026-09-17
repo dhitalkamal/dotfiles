@@ -46,10 +46,10 @@ Trigger: any non-trivial new feature (new endpoint, new UI flow,
 anything touching more than one file). Not a one-line fix, typo, or
 config tweak - those skip this entirely.
 
-When the trigger fires, walk ~/dev-workflow-guide.md's stages before
-writing implementation code, or run /feature-kickoff to do it as an
-explicit checklist. Don't wait to be asked - recognize the trigger
-the same way the project-kickoff gate above recognizes a new project.
+When the trigger fires, run /feature-kickoff and walk its stages
+before writing implementation code - the skill holds the full staged
+workflow. Don't wait to be asked - recognize the trigger the same way
+the project-kickoff gate above recognizes a new project.
 
 Putting this on a task list is not the same as doing it. It only
 counts once its output is actually visible in the conversation before

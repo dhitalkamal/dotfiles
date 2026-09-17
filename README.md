@@ -5,11 +5,10 @@ Personal macOS dev environment with a clean, conflict-free toolchain.
 ## included
 
 - zsh config
-- kitty terminal
+- wezterm terminal
 - starship prompt
 - neovim config
 - git config
-- zellij config
 - claude code config (settings, hooks, skills, rules)
 - Brewfile + one-command setup
 
@@ -25,7 +24,7 @@ cd ~/dotfiles
 
 ```bash
 brew bundle --file Brewfile
-stow git zsh kitty starship nvim zellij
+stow git zsh wezterm starship nvim
 ```
 
 Create `~/.gitconfig_device` if missing:

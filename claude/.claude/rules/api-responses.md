@@ -4,7 +4,6 @@ paths:
   - "**/serializers.py"
   - "**/viewsets.py"
   - "**/urls.py"
-  - "**/api/**"
 ---
 
 # API responses
