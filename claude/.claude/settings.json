@@ -1,28 +1,27 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
-  "respectGitignore": false,
+  "respectGitignore": true,
   "cleanupPeriodDays": 14,
   "env": {
-    "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "70",
+    "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "80",
     "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
-    "CLAUDE_EVALS_DIR": "~/.claude/evals",
-    "CLAUDE_HEADLESS_DIR": "~/.claude/headless",
-    "CLAUDE_HEADLESS_LOG_DIR": "~/.claude/logs/headless",
-    "CLAUDE_ORCHESTRATION_DIR": "~/.claude/orchestration",
-    "CLAUDE_PENDING_DIR": "~/.claude/pending",
-    "CLAUDE_ROUTINES_DIR": "~/.claude/routines",
+    "CLAUDE_EVALS_DIR": "/Users/kamaldhital/.claude/evals",
+    "CLAUDE_HEADLESS_DIR": "/Users/kamaldhital/.claude/headless",
+    "CLAUDE_HEADLESS_LOG_DIR": "/Users/kamaldhital/.claude/logs/headless",
+    "CLAUDE_ORCHESTRATION_DIR": "/Users/kamaldhital/.claude/orchestration",
+    "CLAUDE_PENDING_DIR": "/Users/kamaldhital/.claude/pending",
+    "CLAUDE_ROUTINES_DIR": "/Users/kamaldhital/.claude/routines",
     "EDITOR": "code --wait",
     "MAX_MCP_OUTPUT_TOKENS": "20000",
     "VISUAL": "code --wait"
   },
-  "includeCoAuthoredBy": false,
   "attribution": {
     "commit": "",
     "pr": ""
   },
+  "includeCoAuthoredBy": false,
   "permissions": {
-    "defaultMode": "auto",
     "allow": [
       "Bash(git status *)",
       "Bash(git diff *)",
@@ -53,18 +52,6 @@
       "Bash(printenv *)",
       "Bash(date)",
       "Bash(open *)",
-      "Bash(npm test *)",
-      "Bash(npm run lint *)",
-      "Bash(npm run test *)",
-      "Bash(npm run build *)",
-      "Bash(yarn test *)",
-      "Bash(yarn lint *)",
-      "Bash(pnpm test *)",
-      "Bash(pnpm lint *)",
-      "Bash(node -v)",
-      "Bash(node --version)",
-      "Bash(python --version)",
-      "Bash(python3 --version)",
       "Bash(npm *)",
       "Bash(npx *)",
       "Bash(pnpm *)",
@@ -126,6 +113,14 @@
       "Bash(sudo rm *)",
       "Bash(git push --force*)",
       "Bash(git push -f *)",
+      "Bash(git push * +*)",
+      "Bash(git push origin +*)",
+      "Bash(git push origin main)",
+      "Bash(git push origin main *)",
+      "Bash(git push origin master)",
+      "Bash(git push origin master *)",
+      "Bash(git push origin develop)",
+      "Bash(git push origin develop *)",
       "Bash(git reset --hard *)",
       "Bash(git clean -f*)",
       "Bash(gh repo delete *)",
@@ -157,31 +152,39 @@
       "Bash(chmod -R 777 *)",
       "Bash(dd if=*)",
       "Bash(mkfs*)"
-    ]
+    ],
+    "defaultMode": "auto"
   },
-  "model": "claude-sonnet-5",
-  "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": [
-    "foundry-query-readonly",
-    "foundry-schema-designer",
-    "foundry-migration",
-    "foundry-ops-tuning",
-    "foundry-observability",
-    "foundry-vector",
-    "foundry-memory",
-    "foundry-design-advisor"
-  ],
+  "model": "sonnet[1m]",
   "hooks": {
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "input=$(cat 2>/dev/null); tp=$(printf '%s' \"$input\" | sed -n 's/.*\\\"transcript_path\\\"[[:space:]]*:[[:space:]]*\\\"\\([^\\\"]*\\)\\\".*/\\1/p' | head -n1); p=$PPID; n=0; while [ \"$n\" -lt 15 ]; do case \"$p\" in ''|*[!0-9]*|0|1) break;; esac; t=$(ps -o tty= -p \"$p\" 2>/dev/null | tr -d ' '); if [ -n \"$t\" ] && [ \"$t\" != '??' ] && [ -w \"/dev/$t\" ]; then printf '\\033]9;conterm-agent:claude:attention:%s\\a' \"$tp\" > \"/dev/$t\" 2>/dev/null; break; fi; p=$(ps -o ppid= -p \"$p\" 2>/dev/null | tr -d ' '); n=$((n+1)); done; exit 0 # conterm"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/review-commit.sh",
+            "if": "Bash(git commit *)",
+            "timeout": 120,
+            "statusMessage": "Reviewing the commit that just landed..."
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Write|Edit",
         "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/no-decorative-chars.sh",
-            "timeout": 10,
-            "statusMessage": "Checking for decorative characters..."
-          },
           {
             "type": "command",
             "command": "~/.claude/hooks/file-size-guard.sh",
@@ -193,6 +196,23 @@
             "command": "~/.claude/hooks/agent-tooling-guard.sh",
             "timeout": 10,
             "statusMessage": "Checking tooling write gate..."
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/worktree-policy-gate.sh",
+            "timeout": 10,
+            "statusMessage": "Checking worktree policy..."
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/advisor-gate.sh",
+            "timeout": 10,
+            "statusMessage": "Checking mcp advisor gate..."
           }
         ]
       },
@@ -223,7 +243,27 @@
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/hooks/pr-readiness-guard.sh"
+            "command": "~/.claude/hooks/pr-readiness-guard.sh",
+            "timeout": 10,
+            "statusMessage": "Checking pr readiness..."
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "input=$(cat 2>/dev/null); tp=$(printf '%s' \"$input\" | sed -n 's/.*\\\"transcript_path\\\"[[:space:]]*:[[:space:]]*\\\"\\([^\\\"]*\\)\\\".*/\\1/p' | head -n1); p=$PPID; n=0; while [ \"$n\" -lt 15 ]; do case \"$p\" in ''|*[!0-9]*|0|1) break;; esac; t=$(ps -o tty= -p \"$p\" 2>/dev/null | tr -d ' '); if [ -n \"$t\" ] && [ \"$t\" != '??' ] && [ -w \"/dev/$t\" ]; then printf '\\033]9;conterm-agent:claude:prompt:%s\\a' \"$tp\" > \"/dev/$t\" 2>/dev/null; break; fi; p=$(ps -o ppid= -p \"$p\" 2>/dev/null | tr -d ' '); n=$((n+1)); done; exit 0 # conterm"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "input=$(cat 2>/dev/null); tp=$(printf '%s' \"$input\" | sed -n 's/.*\\\"transcript_path\\\"[[:space:]]*:[[:space:]]*\\\"\\([^\\\"]*\\)\\\".*/\\1/p' | head -n1); p=$PPID; n=0; while [ \"$n\" -lt 15 ]; do case \"$p\" in ''|*[!0-9]*|0|1) break;; esac; t=$(ps -o tty= -p \"$p\" 2>/dev/null | tr -d ' '); if [ -n \"$t\" ] && [ \"$t\" != '??' ] && [ -w \"/dev/$t\" ]; then printf '\\033]9;conterm-agent:claude:end:%s\\a' \"$tp\" > \"/dev/$t\" 2>/dev/null; break; fi; p=$(ps -o ppid= -p \"$p\" 2>/dev/null | tr -d ' '); n=$((n+1)); done; exit 0 # conterm"
           }
         ]
       }
@@ -237,19 +277,12 @@
             "timeout": 5
           }
         ]
-      }
-    ],
-    "PostToolUse": [
+      },
       {
-        "matcher": "Bash",
         "hooks": [
           {
-            "type": "agent",
-            "prompt": "A `git commit` just ran and cannot be blocked at this point - it is already committed. Review the commit that just landed (`git show HEAD --stat` and `git diff HEAD~1 HEAD`) for high-confidence, serious problems: correctness bugs that would break the build or runtime, security issues (committed secrets/keys, injection, broken auth), and obviously incomplete or debug code (leftover console.log/print debugging, large commented-out blocks). Also run the security-advisor scan_secrets tool against the repo root (git rev-parse --show-toplevel). Be fast and pragmatic. If you find a serious problem, flag it clearly in one or two concise lines and suggest a fix-up (amend if not yet pushed, otherwise a follow-up commit) - this is advisory only, you cannot undo the commit yourself. If you cannot access these tools due to a permission restriction, say so in one line and stop - nothing to block either way. Do NOT flag style, formatting, or subjective preferences.",
-            "if": "Bash(git commit *)",
-            "timeout": 120,
-            "model": "claude-sonnet-5",
-            "statusMessage": "Reviewing the commit that just landed..."
+            "type": "command",
+            "command": "input=$(cat 2>/dev/null); tp=$(printf '%s' \"$input\" | sed -n 's/.*\\\"transcript_path\\\"[[:space:]]*:[[:space:]]*\\\"\\([^\\\"]*\\)\\\".*/\\1/p' | head -n1); p=$PPID; n=0; while [ \"$n\" -lt 15 ]; do case \"$p\" in ''|*[!0-9]*|0|1) break;; esac; t=$(ps -o tty= -p \"$p\" 2>/dev/null | tr -d ' '); if [ -n \"$t\" ] && [ \"$t\" != '??' ] && [ -w \"/dev/$t\" ]; then printf '\\033]9;conterm-agent:claude:start:%s\\a' \"$tp\" > \"/dev/$t\" 2>/dev/null; break; fi; p=$(ps -o ppid= -p \"$p\" 2>/dev/null | tr -d ' '); n=$((n+1)); done; exit 0 # conterm"
           }
         ]
       }
@@ -262,6 +295,24 @@
             "command": "~/.claude/hooks/feature-workflow-gate.sh",
             "timeout": 10,
             "statusMessage": "Checking feature workflow gate..."
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "input=$(cat 2>/dev/null); tp=$(printf '%s' \"$input\" | sed -n 's/.*\\\"transcript_path\\\"[[:space:]]*:[[:space:]]*\\\"\\([^\\\"]*\\)\\\".*/\\1/p' | head -n1); p=$PPID; n=0; while [ \"$n\" -lt 15 ]; do case \"$p\" in ''|*[!0-9]*|0|1) break;; esac; t=$(ps -o tty= -p \"$p\" 2>/dev/null | tr -d ' '); if [ -n \"$t\" ] && [ \"$t\" != '??' ] && [ -w \"/dev/$t\" ]; then printf '\\033]9;conterm-agent:claude:idle:%s\\a' \"$tp\" > \"/dev/$t\" 2>/dev/null; break; fi; p=$(ps -o ppid= -p \"$p\" 2>/dev/null | tr -d ' '); n=$((n+1)); done; exit 0 # conterm"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "input=$(cat 2>/dev/null); tp=$(printf '%s' \"$input\" | sed -n 's/.*\\\"transcript_path\\\"[[:space:]]*:[[:space:]]*\\\"\\([^\\\"]*\\)\\\".*/\\1/p' | head -n1); p=$PPID; n=0; while [ \"$n\" -lt 15 ]; do case \"$p\" in ''|*[!0-9]*|0|1) break;; esac; t=$(ps -o tty= -p \"$p\" 2>/dev/null | tr -d ' '); if [ -n \"$t\" ] && [ \"$t\" != '??' ] && [ -w \"/dev/$t\" ]; then printf '\\033]9;conterm-agent:claude:prompt:%s\\a' \"$tp\" > \"/dev/$t\" 2>/dev/null; break; fi; p=$(ps -o ppid= -p \"$p\" 2>/dev/null | tr -d ' '); n=$((n+1)); done; exit 0 # conterm"
           }
         ]
       }
@@ -283,17 +334,21 @@
     "command": "~/.claude/statusline/statusline.sh"
   },
   "enabledPlugins": {
-    "pr-review-toolkit@claude-plugins-official": true,
     "code-review@claude-plugins-official": true,
-    "context7@claude-plugins-official": true
+    "context7@claude-plugins-official": true,
+    "pr-review-toolkit@claude-plugins-official": true,
+    "rust-analyzer-lsp@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true,
+    "vercel@claude-plugins-official": true,
+    "sentry@claude-plugins-official": true,
+    "clangd-lsp@claude-plugins-official": true
   },
   "language": "english",
-  "effortLevel": "high",
   "tui": "fullscreen",
   "skipWorkflowUsageWarning": true,
   "theme": "dark",
   "editorMode": "normal",
-  "preferredNotifChannel": "notifications_disabled",
+  "preferredNotifChannel": "terminal_bell",
   "teammateMode": "in-process",
   "skipAutoPermissionPrompt": true,
   "useAutoModeDuringPlan": true

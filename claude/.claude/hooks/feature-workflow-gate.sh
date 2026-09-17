@@ -55,7 +55,7 @@ if grep -q '"name":"AskUserQuestion"' "$TRANSCRIPT" 2>/dev/null; then
 	exit 0
 fi
 
-SOURCE_WRITES=$(grep -oE '"file_path":"[^"]*\.(swift|ts|tsx|js|jsx|py|go|rs|java|kt|rb)"' "$TRANSCRIPT" 2>/dev/null | sort -u | wc -l | tr -d ' ')
+SOURCE_WRITES=$(grep -oE '"file_path":"[^"]*\.(swift|ts|tsx|js|jsx|py|go|rs|java|kt|rb)"' "$TRANSCRIPT" 2>/dev/null | sort -u | wc -l | tr -d ' ' || true)
 
 if [ "$SOURCE_WRITES" -ge 3 ]; then
 	echo $((COUNT + 1)) > "$COUNTER_FILE"
